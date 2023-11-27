@@ -1,4 +1,5 @@
 import os
+import openai
 # import for pdf Loading
 from langchain.document_loaders import PyPDFLoader
 # imports for video loading
@@ -35,6 +36,16 @@ def get_api():
     _ = load_dotenv(find_dotenv()) # read local .env file
     return os.environ['OPENAI_API_KEY']
 
+def passModerationTest(message):
+    response = openai.Moderation.create(
+        model="text-moderation-latest",
+        messages=message)
+    moderation_output = response["results"][0]
+    # print(moderation_output)
+    if moderation_output["flagged"] != False: # flagged = true -> not pass
+        return False
+    else:
+        return True
 
 
 # Function to load PDF file
@@ -139,6 +150,50 @@ def db_loader(pdfPath):
 
 def qa_Chain(vectorstore):
     return ConversationalRetrievalChain.from_llm(OpenAI(temperature=0), vectorstore.as_retriever())
+
+# ########################################################
+# #      11/24/2023 Sharon try coding on DataLoading     #
+# #      Yajie / AALIYAH please test ASAP                #       
+# ########################################################
+# # Sharon: General function to load PDF
+# def loadPDF(path, docs):
+#     loader = PyPDFLoader(path)
+#     docs.extend(loader.load())
+#     return docs
+
+# # Sharon: General function to load Video
+# def loadVideo(url, docs):
+#     save_dir="docs/youtube/"
+#     loader = GenericLoader(
+#         YoutubeAudioLoader([url],save_dir),
+#         OpenAIWhisperParser()
+#     )
+#     docs.extend(loader.load())
+#     return docs
+
+# # Sharon: General function to load URL
+# def loadURL(url, docs):
+#     loader = WebBaseLoader(url)
+#     docs.extend(loader.load())
+#     return docs
+
+# # Sharon: General function to load data and return vectordb
+# def loadData(sourcePDF, sourceVideo, sourceURL, docs):
+#     if sourcePDF:
+#         for source in sourcePDF:
+#             docs = loadPDF(source, docs)
+
+#     if sourceVideo:
+#         for source in sourceVideo:
+#             docs = loadVideo(source, docs)
+
+#     if sourceURL:
+#         for source in sourceURL:
+#             docs = loadURL(source, docs)
     
+#     splits = splitCharacterText(docs)
+#     # indexing and Save in vectorstores
+#     vectordb = saveVectorStores(splits)
+#     return vectordb
 
 
