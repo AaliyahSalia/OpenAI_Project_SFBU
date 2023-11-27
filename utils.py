@@ -39,7 +39,7 @@ def get_api():
 def passModerationTest(message):
     response = openai.Moderation.create(
         model="text-moderation-latest",
-        messages=message)
+        input=message)
     moderation_output = response["results"][0]
     # print(moderation_output)
     if moderation_output["flagged"] != False: # flagged = true -> not pass
